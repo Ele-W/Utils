@@ -1,0 +1,76 @@
+public class Utils {
+    //使用静态变量
+    private static String url;
+    private static String user;
+    private static String password;
+    private static String driver;
+    //使用静态代码块，使用配置文件将数据导入
+    static {
+        try {
+            System.out.println("工具类加载····················");
+            //加载配置文件
+            //使用类加载器
+            Properties properties = new Properties();
+            ClassLoader classLoader = Utils.class.getClassLoader();
+            URL res = classLoader.getResource("jdbc.propertis");
+            //获取配置文件中的值
+            String path = res.getPath();
+            properties.load(new FileReader(path));
+            
+            url = properties.getProperty("url");
+            user = properties.getProperty("user");
+            password = properties.getProperty("password");
+            driver = properties.getProperty("driver");
+            //注册驱动
+            Class.forName(driver);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+    //获取链接
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(url,user,password);
+    }
+    //释放资源
+    public static void close(Connection conn, Statement stat){
+        if(stat != null){
+            try {
+                stat.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+        if (conn != null){
+            try {
+                conn.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+    }
+    //重载
+    public static void close(ResultSet rs, Connection conn, PreparedStatement stat){
+        if (rs != null){
+            try {
+                rs.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+        if(stat != null){
+            try {
+                stat.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+        if (conn != null){
+            try {
+                conn.close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+    }
